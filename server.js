@@ -8,14 +8,13 @@ app.use(express.json());
 
 const PORT = 3001;
 
-// Temporary in-memory data
 let products = [
     {
         id: 1,
         name: "iPhone 15",
         price: 1299,
         description: "Apple smartphone",
-        imageUrl: "https://example.com/iphone15.jpg",
+        imageUrl: "http://localhost:3000/images/iphone.png",
         category: "Phones",
         inStock: true
     },
@@ -24,25 +23,40 @@ let products = [
         name: "Samsung TV",
         price: 899,
         description: "4K Smart TV",
-        imageUrl: "https://example.com/tv.jpg",
+        imageUrl: "http://localhost:3000/images/tv.jpg",
         category: "TVs",
+        inStock: true
+    },
+    {
+        id: 3,
+        name: "iPad",
+        price: 899,
+        description: "Apple tablet",
+        imageUrl: "http://localhost:3000/images/ipad.png",
+        category: "Tablets",
+        inStock: true
+    },
+    {
+        id: 4,
+        name: "PlayStation 5",
+        price: 699,
+        description: "Next-gen Sony gaming console",
+        imageUrl: "http://localhost:3000/images/ps5.png",
+        category: "Gaming",
         inStock: true
     }
 ];
 
-// Health check
 app.get("/", (req, res) => {
     res.status(200).json({
         message: "Best Buy Product Service is running"
     });
 });
 
-// Get all products
 app.get("/products", (req, res) => {
     res.status(200).json(products);
 });
 
-// Get one product
 app.get("/products/:id", (req, res) => {
     const id = Number(req.params.id);
     const product = products.find((p) => p.id === id);
@@ -54,7 +68,6 @@ app.get("/products/:id", (req, res) => {
     res.status(200).json(product);
 });
 
-// Create product
 app.post("/products", (req, res) => {
     const { name, price, description, imageUrl, category, inStock } = req.body;
 
@@ -72,7 +85,6 @@ app.post("/products", (req, res) => {
     res.status(201).json(newProduct);
 });
 
-// Update product
 app.put("/products/:id", (req, res) => {
     const id = Number(req.params.id);
     const index = products.findIndex((p) => p.id === id);
@@ -85,7 +97,6 @@ app.put("/products/:id", (req, res) => {
     res.status(200).json(products[index]);
 });
 
-// Delete product
 app.delete("/products/:id", (req, res) => {
     const id = Number(req.params.id);
     const index = products.findIndex((p) => p.id === id);

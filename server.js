@@ -112,7 +112,7 @@ const Product = mongoose.model("Product", productSchema);
 // Used to verify service is running
 app.get("/", (req, res) => {
     res.status(200).json({
-        message: "Product Service is updated via CI/CD pipeline and running successfully!"
+        message: "Best Buy Product Service is running"
     });
 });
 

@@ -1,21 +1,62 @@
+/**
+ * CST8915 Final Project - Product Service
+ *
+ * Author: Xinyi Zhao
+ * Course: CST8915 Full-stack Cloud-native Development
+ * Semester: Winter 2026
+ *
+ * Description:
+ * This service manages product data for the Best Buy demo application.
+ * It provides RESTful APIs to create, retrieve, update, and delete products.
+ *
+ * Architecture Role:
+ * - Backend microservice deployed on Azure Kubernetes Service (AKS)
+ * - Stores product data using MongoDB (persistent storage)
+ * - Serves data to store-front and store-admin services
+ *
+ * Features:
+ * - Retrieve all products
+ * - Retrieve a single product by ID
+ * - Add new products (admin)
+ * - Update existing products
+ * - Delete products
+ *
+ * Note:
+ * - Uses MongoDB for persistent storage
+ * - Image URLs are stored as part of product data
+ * - Core data service for the entire application
+ */
 const express = require("express");
 const cors = require("cors");
 
 const app = express();
 
+// ==============================
+// Middleware
+// ==============================
 app.use(cors());
 app.use(express.json());
 
+// ==============================
+// Configuration
+// ==============================
 const PORT = 3001;
 
+// MongoDB connection string (from Kubernetes env)
 const mongoose = require("mongoose");
-
 const MONGO_URL = process.env.MONGO_URL || "mongodb://mongodb:27017/bestbuy";
 
+// ==============================
+// MongoDB Connection
+// ==============================
 mongoose.connect(MONGO_URL)
     .then(() => console.log("MongoDB connected"))
     .catch(err => console.error(err));
 
+// ==============================
+// Schema & Model
+// ==============================
+// Defines structure of product documents in MongoDB
 const productSchema = new mongoose.Schema({
     name: String,
     price: Number,
@@ -65,17 +106,28 @@ const Product = mongoose.model("Product", productSchema);
 //     }
 // ];
 
+// ==============================
+// Health Check
+// ==============================
+// Used to verify service is running
 app.get("/", (req, res) => {
     res.status(200).json({
         message: "Best Buy Product Service is running"
     });
 });
 
+// ==============================
+// Get All Products
+// ==============================
 app.get("/products", async (req, res) => {
     const products = await Product.find();
     res.json(products);
 });
 
+// ==============================
+// Get Product by ID (Legacy)
+// ==============================
+// NOTE: This uses old in-memory logic and is not used
 app.get("/products/:id", async (req, res) => {
     try {
         const product = await Product.findById(req.params.id);
@@ -93,12 +145,20 @@ app.get("/products/:id", async (req, res) => {
     }
 });
 
+// ==============================
+// Create Product
+// ==============================
+// Adds a new product to MongoDB
 app.post("/products", async (req, res) => {
     const product = new Product(req.body);
     await product.save();
     res.json(product);
 });
 
+// ==============================
+// Update Product (Legacy)
+// ==============================
+// NOTE: Uses in-memory array (not active)
 app.put("/products/:id", async (req, res) => {
     try {
         const updatedProduct = await Product.findByIdAndUpdate(
@@ -120,6 +180,10 @@ app.put("/products/:id", async (req, res) => {
     }
 });
 
+// ==============================
+// Delete Product
+// ==============================
+// Removes a product from MongoDB using _id
 app.delete("/products/:id", async (req, res) => {
     try {
         const deletedProduct = await Product.findByIdAndDelete(req.params.id);
@@ -138,6 +202,9 @@ app.delete("/products/:id", async (req, res) => {
     }
 });
 
+// ==============================
+// Start Server
+// ==============================
 app.listen(PORT, () => {
     console.log(`Product Service is running on port ${PORT}`);
 });
